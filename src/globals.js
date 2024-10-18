@@ -960,7 +960,7 @@ export const blockchainInfo = {
     rpcUrl: "https://arbitrum-sepolia.infura.io/v3/ac240982f9804e358d1f59fc60a5c451",
     icon: arbitrumIcon, // Same variable for Sepolia testnet
     wormholeChainId: 10003,
-    bridgeContractAddress: "0x2ae49713D011f558F67585E946c3729FE1e8489e",
+    bridgeContractAddress: "0x9281F9c872803cb6C5A3576dFba7210F23Ce24E4",
     assets: [
       {
         address: "0x01695B0b5087597a85A4AB6bE0054f0Bd7c5312A",
@@ -985,7 +985,7 @@ export const blockchainInfo = {
     icon: avalancheIcon, // Same variable for Fuji testnet
     wormholeChainId: 6,
     // bridgeContractAddress: "0xA11e9c666ED79456951807334B290e0ee422D215",
-    bridgeContractAddress: "0x2ae49713D011f558F67585E946c3729FE1e8489e",
+    bridgeContractAddress: "0x9281F9c872803cb6C5A3576dFba7210F23Ce24E4",
     assets: [
       {
         address: "0xdAD351E06D689f4A48F3033e2Ddcd3474ef89E8b",
