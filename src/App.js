@@ -1,24 +1,203 @@
-import logo from './logo.svg';
-import './App.css';
+import '@fontsource/roboto'; // Defaults to weight 400.
+import { TargetBlockchainChainId, walletConnectMetadata, walletConnectProjectId, walletConnectTargetBlockchainConfig, blockchainInfo } from './globals';
+
+import React, { useEffect, useState } from 'react';
+import { createWeb3Modal, defaultConfig } from '@web3modal/ethers/react';
+import { useWeb3Modal, useDisconnect } from '@web3modal/ethers/react';
+import { useWeb3ModalProvider, useWeb3ModalAccount } from '@web3modal/ethers/react';
+import { Button, Typography, Box, Container, Paper, AppBar, Toolbar, MenuItem, Menu } from '@mui/material';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { purple, green } from '@mui/material/colors';
+
+import Bridge from './components/Bridge/components/Bridge';
+import SecuritizeCreditVault from './components/SecuritizeCreditVault/components/SecuritizeCreditVault';
+import SecuritizeCreditVaultApp from './components/SecuritizeCreditVault/CreditVaultApp';
+import WalletDisplay from './utils/WalletDisplay';
+import BridgeApp from './components/Bridge/BrigeApp';
+import EditableTable from './components/InvestorIngest/EditableTable';
+
+// Create Ethers config
+const ethersConfig = defaultConfig({
+  metadata: walletConnectMetadata,
+  enableEIP6963: true,
+  enableInjected: true,
+  enableCoinbase: true,
+  rpcUrl: '...',
+  defaultChainId: TargetBlockchainChainId,
+});
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      // main: purple[500],  // Customize primary button color
+      main: "#3b3d5b",  // Customize primary button color
+      // backgroundColor: "#3b3d5b",
+
+    },
+    secondary: {
+      main: green[500],  // Customize secondary button color
+    },
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: '8px', // Example of adding a custom style
+        },
+        containedPrimary: {
+          // backgroundColor: purple[500],
+          color: '#fff',
+          '&:hover': {
+            backgroundColor: purple[700],
+          },
+        },
+        containedSecondary: {
+          backgroundColor: green[500],
+          color: '#fff',
+          '&:hover': {
+            backgroundColor: green[700],
+          },
+        },
+        outlinedPrimary: {
+          borderColor: purple[500],
+          color: purple[500],
+          '&:hover': {
+            borderColor: purple[700],
+            color: purple[700],
+          },
+        },
+        outlinedSecondary: {
+          borderColor: green[500],
+          color: green[500],
+          '&:hover': {
+            borderColor: green[700],
+            color: green[700],
+          },
+        },
+      },
+    },
+  },
+});
+
+
+// Create a AppKit instance
+createWeb3Modal({
+  ethersConfig,
+  chains: walletConnectTargetBlockchainConfig,
+  projectId: walletConnectProjectId,
+  enableAnalytics: true,
+});
+
+function ConnectButton() {
+  const { open } = useWeb3Modal();
+
+  return (
+    <Button
+      variant="contained"
+      color="primary"
+      onClick={() => open({})}
+      sx={{
+        ':hover': {
+          backgroundColor: 'primary.dark',
+        },
+      }}
+    >
+      Connect Wallet
+    </Button>
+  );
+}
 
 function App() {
+  const { isConnected } = useWeb3ModalAccount();
+  const { address } = useWeb3ModalAccount();
+  const { disconnect } = useDisconnect();
+
+  const [selectedView, setSelectedView] = useState(0); // State to control selected view
+
+  // Function to handle view change
+  const handleViewChange = (view) => {
+    setSelectedView(view);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ThemeProvider theme={theme}>
+      <>
+        <AppBar position="sticky" sx={{ backgroundColor: 'grey', marginBottom: '12px' }}>
+          <Toolbar sx={{ justifyContent: 'space-between', backgroundColor: "#2b2d42" }}>
+            {isConnected ? (
+              <>
+                <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-start' }}>
+                  <Button
+                    color="inherit"
+                    onClick={() => handleViewChange(0)}
+                    sx={{
+                      backgroundColor: selectedView === 0 ? 'primary.main' : 'inherit',
+                      color: selectedView === 0 ? 'white' : 'inherit',
+                      ':hover': {
+                        backgroundColor: selectedView === 0 ? 'primary.dark' : 'grey.300',
+                      },
+                    }}
+                  >
+                    Vault
+                  </Button>
+                  <Button
+                    color="inherit"
+                    onClick={() => handleViewChange(1)}
+                    sx={{
+                      backgroundColor: selectedView === 1 ? 'primary.main' : 'inherit',
+                      color: selectedView === 1 ? 'white' : 'inherit',
+                      ':hover': {
+                        backgroundColor: selectedView === 1 ? 'primary.dark' : 'grey.300',
+                      },
+                    }}
+                  >
+                    Bridge
+                  </Button>
+                  {/* <Button
+                    color="inherit"
+                    onClick={() => handleViewChange(2)}
+                    sx={{
+                      backgroundColor: selectedView === 2 ? 'primary.main' : 'inherit',
+                      color: selectedView === 2 ? 'white' : 'inherit',
+                      ':hover': {
+                        backgroundColor: selectedView === 1 ? 'primary.dark' : 'grey.300',
+                      },
+                    }}
+                  >
+                    Investor Ingest
+                  </Button> */}
+                </Box>
+                <Box>
+                  <WalletDisplay address={address} disconnect={disconnect} />
+                </Box>
+              </>
+            ) : (<> Securitize Dev </>)}
+          </Toolbar>
+        </AppBar>
+
+        {isConnected ? (
+          <Box >
+            {selectedView === 0 && <SecuritizeCreditVault />}
+            {selectedView === 1 && <Bridge network1={blockchainInfo.avalancheFuji} network2={blockchainInfo.arbitrumSepolia} />}
+            {/* {selectedView === 2 && <EditableTable />} */}
+          </Box>
+        ) : (
+          <Box textAlign="center">
+            <ConnectButton />
+          </Box>
+        )}
+      </>
+      {/* {isConnected ? (
+        <Box >
+          <SecuritizeCreditVaultApp></SecuritizeCreditVaultApp>
+        </Box>
+      ) : (
+        <Box textAlign="center">
+          <ConnectButton />
+        </Box>
+      )}
+      <BridgeApp network1={blockchainInfo.avalancheFuji} network2={blockchainInfo.celoAlfajores}></BridgeApp> */}
+    </ThemeProvider>
   );
 }
 
