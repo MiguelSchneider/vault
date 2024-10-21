@@ -214,6 +214,7 @@ const CryptoInput = ({ network, setNetwork, amount, balance, setAmount, editable
                 onClose={handleCloseModal}
                 onSelect={setNetwork}
                 label="Choose Your Blockchain Network"
+                currentNetwork={network}
             />
         </>
     );
